@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23231" systemVersion="24A335" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="YES" userDefinedModelVersionIdentifier="">
+    <!--
+      CloudKit rules baked into this model:
+      • Every attribute is optional OR has a default value (CloudKit requirement)
+      • Every relationship is optional and has an inverse (CloudKit requirement)
+      • No unique constraints (NSPersistentCloudKitContainer does not support them)
+      • Media (audio/images) is NOT stored here — save to the App Group container
+        and keep only the filename in rawMediaFilename. CloudKit syncs it as an
+        external binary automatically if you instead use allowsExternalBinaryDataStorage,
+        but file-based keeps the store lean and the widget fast.
+    -->
+
+    <entity name="Memory" representedClassName="Memory" syncable="YES" codeGenerationType="class">
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="content" optional="YES" attributeType="String" defaultValueString=""/>
+        <attribute name="captureMode" optional="YES" attributeType="String" defaultValueString="text"/>
+        <attribute name="transcription" optional="YES" attributeType="String"/>
+        <attribute name="rawMediaFilename" optional="YES" attributeType="String"/>
+        <attribute name="embedding" optional="YES" attributeType="Binary"/>
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="lastReviewedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="reviewCount" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="topics" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Topic" inverseName="memories" inverseEntity="Topic"/>
+        <relationship name="people" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Person" inverseName="memories" inverseEntity="Person"/>
+        <relationship name="reflections" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Reflection" inverseName="memory" inverseEntity="Reflection"/>
+        <relationship name="echoes" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="EchoHistory" inverseName="memory" inverseEntity="EchoHistory"/>
+    </entity>
+
+    <entity name="Topic" representedClassName="Topic" syncable="YES" codeGenerationType="class">
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="name" optional="YES" attributeType="String" defaultValueString=""/>
+        <attribute name="emoji" optional="YES" attributeType="String"/>
+        <attribute name="lastInsightAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="memories" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Memory" inverseName="topics" inverseEntity="Memory"/>
+        <relationship name="insights" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Insight" inverseName="topic" inverseEntity="Insight"/>
+    </entity>
+
+    <entity name="Person" representedClassName="Person" syncable="YES" codeGenerationType="class">
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="name" optional="YES" attributeType="String" defaultValueString=""/>
+        <relationship name="memories" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Memory" inverseName="people" inverseEntity="Memory"/>
+    </entity>
+
+    <entity name="Insight" representedClassName="Insight" syncable="YES" codeGenerationType="class">
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="summary" optional="YES" attributeType="String" defaultValueString=""/>
+        <attribute name="generatedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="topic" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Topic" inverseName="insights" inverseEntity="Topic"/>
+    </entity>
+
+    <entity name="Reflection" representedClassName="Reflection" syncable="YES" codeGenerationType="class">
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="note" optional="YES" attributeType="String" defaultValueString=""/>
+        <attribute name="addedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="memory" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Memory" inverseName="reflections" inverseEntity="Memory"/>
+    </entity>
+
+    <entity name="EchoHistory" representedClassName="EchoHistory" syncable="YES" codeGenerationType="class">
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="surfacedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="viewCount" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="memory" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Memory" inverseName="echoes" inverseEntity="Memory"/>
+    </entity>
+
+</model>
